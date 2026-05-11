@@ -8,8 +8,8 @@ rather than hardcoding strings.
 """
 from pathlib import Path
 
-# Repo root (the directory containing this file)
-REPO_ROOT = Path(__file__).resolve().parent
+# config.py lives at src/config.py — repo root is one level up
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # ---------------------------------------------------------------------------
 # Raw NRD data — request access from https://hcup-us.ahrq.gov/

@@ -19,15 +19,34 @@ icd/
 ├── README.md                       this file
 ├── LICENSE                         MIT
 ├── .gitignore
-├── config.example.py               copy to config.py and edit for your env
-├── config.py                       (gitignored) your real local paths
-├── environment.yml / env_min.yml   conda environments
+├── environment.yml                 conda environment (icd_gpu)
 ├── requirements.txt                pip-installable subset
 ├── CLAUDE.md                       guidance for Claude Code
 │
-├── *.py                            23 Python scripts (pipeline + utilities)
+├── src/                            all Python source
+│   ├── config.example.py           copy to config.py for your env
+│   ├── config.py                   (gitignored) your real local paths
+│   ├── preprocessing.py            NRD preprocessing pipeline
+│   ├── train/                      model training
+│   │   ├── transformer.py
+│   │   ├── hyper_tune.py
+│   │   └── pretrained_embedding.py
+│   ├── evaluate/                   evaluation + baselines + statistics
+│   │   ├── evaluate.py
+│   │   ├── fit_LR_baseline.py
+│   │   ├── delong_test.py
+│   │   └── compute_p_value.py
+│   ├── calibration/                calibration curves vs. baselines
+│   │   └── calibration_curve.py
+│   ├── feature_importance/         Integrated Gradients interpretation
+│   │   ├── IG.py
+│   │   └── visualize_icd_importance.py
+│   └── inference/                  ad-hoc inference utilities
+│       ├── predict_single_patient.py
+│       ├── predict_on_small_dataset.py
+│       └── create_small_test_dataset.py
 │
-├── slurm/                          SLURM batch scripts
+├── scripts/                        SLURM batch scripts (one per pipeline stage)
 ├── notebooks/                      Jupyter notebooks (outputs stripped)
 └── results/                        small artifacts safe to commit
     ├── figures/                    PNG plots
@@ -37,7 +56,7 @@ icd/
 ```
 
 The following directories are referenced by the scripts but **not**
-checked into git (they are listed in `.gitignore`):
+checked into git (listed in `.gitignore`):
 
 | Path               | Contents                                          |
 |--------------------|---------------------------------------------------|
@@ -45,7 +64,6 @@ checked into git (they are listed in `.gitignore`):
 | `Model/`           | Trained `.keras` models, label encoder, scaler    |
 | `Baselines/`       | Logistic-regression baselines for comorbidity indices |
 | `embeddings/`      | Pretrained ICD-10 embedding tables                |
-| `tensorflow-*.simg`| Apptainer image used on Oscar HPC                 |
 | `predictions.csv`  | Generated patient-level predictions               |
 | `logs/`            | SLURM `.out` job logs                             |
 
@@ -56,90 +74,77 @@ are restricted and **not redistributable** — request access from the
 Healthcare Cost and Utilization Project at
 [https://hcup-us.ahrq.gov/](https://hcup-us.ahrq.gov/).
 
-Once obtained, place the pooled CSV at the path you set in `config.py`
-(default: the value of `NRD_RAW_CSV`).
+Once obtained, place the pooled CSV at the path you set in
+`src/config.py` (default: the value of `NRD_RAW_CSV`).
 
 ## Environment setup
 
-This project is developed on Brown University's Oscar HPC cluster. Two
-options are supported:
-
-### Conda
+Developed on Brown University's Oscar HPC cluster.
 
 ```bash
 conda env create -f environment.yml
 conda activate icd_gpu
 ```
 
-### Apptainer (Singularity)
-
-```bash
-apptainer exec --nv tensorflow-24.03-tf2-py3.simg python <script.py>
-```
-
-The Apptainer image is too large to commit; build it once on Oscar with
-`apptainer pull docker://nvcr.io/nvidia/tensorflow:24.03-tf2-py3` (or the
-matching tag).
+`requirements.txt` lists the same packages for `pip`-based installs.
 
 ## Configuration
 
-All on-disk paths live in `config.py`. To set up a fresh checkout:
+All on-disk paths live in `src/config.py`. To set up a fresh checkout:
 
 ```bash
-cp config.example.py config.py
-# edit config.py — point NRD_RAW_CSV, DATA_DIR, NRD_2021_TEST, NRD_2022_TEST
-# at your local copies of the NRD data.
+cp src/config.example.py src/config.py
+# edit src/config.py — point NRD_RAW_CSV, DATA_DIR, NRD_2021_TEST,
+# NRD_2022_TEST at your local copies of the NRD data.
 ```
 
 Every Python script does `from config import ...`, so changing a path
-once in `config.py` is enough. `config.py` is gitignored so personal paths
-never enter version control.
+once in `src/config.py` is enough. `src/config.py` is gitignored so
+personal paths never enter version control.
 
 ## Pipeline
 
-All long-running jobs are launched via SLURM batch scripts in `slurm/`.
-Submit them from the repo root:
+All long-running jobs are launched via SLURM batch scripts in `scripts/`.
+Each script `cd`s to the repo root, prepends `src/` to `PYTHONPATH`, then
+invokes the corresponding Python module. Submit them from the repo root:
 
 ```bash
 # 1. Preprocess the pooled NRD CSV → train/test splits per outcome
-sbatch slurm/preprocessing.sh
+sbatch scripts/preprocessing.sh
 
-# 2. Train the model (edit transformer.py to switch outcome)
-sbatch slurm/run.sh                # uses Apptainer
-# or
-sbatch slurm/run_apptain.sh        # hyperparameter search
+# 2. Train the model (edit src/train/transformer.py to switch outcome)
+sbatch scripts/run.sh                # train transformer
+sbatch scripts/hyper_tune.sh         # hyperparameter search
 
 # 3. Evaluate on held-out 2021-2022 data (vs. ECI / CCI baselines)
-sbatch slurm/evaluate.sh
-sbatch slurm/evaluate_clean.sh
+sbatch scripts/evaluate.sh
 
 # 4. Fit logistic-regression baselines for comorbidity indices
-sbatch slurm/fit_LR.sh
-sbatch slurm/verify.sh             # sanity-check that LR preserves AUC
+sbatch scripts/fit_LR.sh
 
 # 5. Calibration curves
-sbatch slurm/calibration.sh
+sbatch scripts/calibration.sh
 
 # 6. Statistical AUC comparison
-sbatch slurm/delong_test.sh
+sbatch scripts/delong_test.sh
 
 # 7. Feature importance via Integrated Gradients
-sbatch slurm/interpretation.sh
+sbatch scripts/interpretation.sh
 ```
 
-Each SLURM script `cd`s to the repo root before invoking Python and writes
-its `.out` log into `logs/<category>/`.
+Each script writes its `.out` log into `logs/<category>/`, which is
+gitignored.
 
 ## Notebooks
 
-| Notebook                            | Purpose                                       |
-|-------------------------------------|-----------------------------------------------|
-| `notebooks/data_preprocessing.ipynb`| Exploratory NRD preprocessing                 |
-| `notebooks/Transformers.ipynb`      | Prototype model architectures                 |
-| `notebooks/Hyperparameter.ipynb`    | Manual hyperparameter sweep notes             |
-| `notebooks/Validate.ipynb`          | Held-out evaluation walkthrough               |
-| `notebooks/Embeddings_trial.ipynb`  | Pretrained ICD-10 embedding experiments       |
-| `notebooks/Dataset_size_examine.ipynb`| Sample-size scaling analysis                |
+| Notebook                              | Purpose                                       |
+|---------------------------------------|-----------------------------------------------|
+| `notebooks/data_preprocessing.ipynb`  | Exploratory NRD preprocessing                 |
+| `notebooks/Transformers.ipynb`        | Prototype model architectures                 |
+| `notebooks/Hyperparameter.ipynb`      | Manual hyperparameter sweep notes             |
+| `notebooks/Validate.ipynb`            | Held-out evaluation walkthrough               |
+| `notebooks/Embeddings_trial.ipynb`    | Pretrained ICD-10 embedding experiments       |
+| `notebooks/Dataset_size_examine.ipynb`| Sample-size scaling analysis                  |
 
 Outputs are stripped from committed notebooks. Re-run cells locally to
 regenerate plots.
@@ -153,8 +158,8 @@ Three custom serializable Keras objects are used across the pipeline:
 - **`F2Score`** — F2 metric (weights recall higher than precision)
 
 All are registered with `@register_keras_serializable(package="Custom")`.
-They are currently duplicated inline at the top of each script that loads a
-trained model (~11 files). See **TODO** below.
+They are currently duplicated inline at the top of each script that loads
+a trained model. See **TODO** below.
 
 ## Outcomes
 
@@ -164,7 +169,7 @@ trained model (~11 files). See **TODO** below.
 | `MOR30`    | 30-day mortality (in or out of hospital)                |
 | `REA30`    | 30-day readmission (excludes patients who died)         |
 
-To switch outcome, edit `OUTCOME` in `config.py` (used by
+To switch outcome, edit `OUTCOME` in `src/config.py` (used by
 `preprocessing.py`) and the `OUTCOME_VAR` constant inside the relevant
 training/evaluation script.
 
@@ -192,7 +197,7 @@ redistributed here.
 ## Known TODOs
 
 - **Deduplicate custom Keras layers.** `DeepSet`, `TransformerBlock`, and
-  `F2Score` are copy-pasted into ~11 scripts. They should move to a
+  `F2Score` are copy-pasted into ~9 scripts. They should move to a
   shared `src/custom_layers.py`. Deferred because the
   `register_keras_serializable(package="Custom")` registration string is
   embedded in saved `.keras` files; consolidating without first re-saving
