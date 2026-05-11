@@ -1,0 +1,11 @@
+icd_code,code_id,support_eval,ig_absolute_total,ig_absolute_mean,ig_signed_total,ig_signed_mean,target,baseline,steps,icd_description
+C9202,2109,149,0.20828517,0.0013978870323040300,0.20828517,0.0013978870323040300,logit,pad,32,"Acute myeloblastic leukemia, in relapse"
+D5700,2720,644,0.89011407,0.0013821647033928300,0.89011407,0.0013821647033928300,logit,pad,32,"Hb-SS disease with crisis, unspecified"
+D57219,2731,140,0.18281339,0.0013058099363531400,0.18281339,0.0013058099363531400,logit,pad,32,"Sickle-cell/Hb-C disease with crisis, unspecified"
+O471,19530,54,0.06987993,0.0012940727174282100,0.06987993,0.0012940727174282100,logit,pad,32,"False labor at or after 37 completed weeks of gestation"
+O1403,18440,51,0.06461443,0.0012669496092141800,0.06461443,0.0012669496092141800,logit,pad,32,"Mild to moderate pre-eclampsia, third trimester"
+C9102,2082,50,0.062729806,0.0012545961141586300,0.062729806,0.0012545961141586300,logit,pad,32,"Acute lymphoblastic leukemia, in relapse"
+O10913,18404,111,0.13379714,0.001205379629994300,0.13379714,0.001205379629994300,logit,pad,32,"Unspecified pre-existing hypertension complicating pregnancy, third trimester"
+C9200,2107,726,0.86272025,0.0011883199050735200,0.86272025,0.0011883199050735200,logit,pad,32,"Acute myeloblastic leukemia, not having achieved remission"
+Z3A34,53518,607,0.6938386,0.0011430619379637500,0.6938386,0.0011430619379637500,logit,pad,32,"34 weeks gestation of pregnancy"
+O10013,18376,51,0.05787724,0.0011348478203895000,0.05787724,0.0011348478203895000,logit,pad,32,"Pre-existing essential hypertension complicating pregnancy, third trimester"

@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.Python
+build/
+dist/
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env
+
+# Local config (contains real on-disk paths)
+config.py
+
+# Restricted / large data — must be obtained separately
+data/
+Model/
+Baselines/
+embeddings/
+*.simg
+*.sif
+
+# Generated model artifacts
+*.keras
+*.pkl
+*.h5
+
+# Generated prediction files (15MB+)
+predictions.csv
+
+# SLURM logs
+logs/
+*.out
+*.err
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code session state
+.claude/

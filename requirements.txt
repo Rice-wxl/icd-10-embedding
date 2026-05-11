@@ -1,0 +1,10 @@
+tensorflow==2.15.0
+keras==2.15.0
+pandas
+numpy
+scikit-learn
+scipy
+matplotlib
+tqdm
+keras-tuner
+shap

@@ -1,0 +1,11 @@
+icd_code,code_id,support_eval,ig_absolute_total,ig_absolute_mean,ig_signed_total,ig_signed_mean,target,baseline,steps,icd_description
+X999XXA,52278,61,0.066897765,0.0010966846688849027,-0.066897765,-0.0010966846688849027,logit,pad,32,"Assault by unspecified sharp object, initial encounter"
+O1415,18447,406,0.44286582,0.0010908025092092053,-0.44286582,-0.0010908025092092053,logit,pad,32,"Severe pre-eclampsia, complicating the puerperium"
+K3533,10404,382,0.3951605,0.0010344515608243293,-0.3951605,-0.0010344515608243293,logit,pad,32,"Acute appendicitis with perforation, localized peritonitis, and gangrene, with abscess"
+Z471,53597,121,0.121958666,0.0010079228557831,-0.121958666,-0.0010079228557831,logit,pad,32,"Aftercare following joint replacement surgery"
+W5501XA,51654,100,0.097474545,0.0009747454524040222,-0.097474545,-0.0009747454524040222,logit,pad,32,"Bitten by cat, initial encounter"
+K3532,10403,304,0.29008508,0.0009542272279137059,-0.29008508,-0.0009542272279137059,logit,pad,32,"Acute appendicitis with perforation, localized peritonitis, and gangrene, without abscess"
+O210,18473,160,0.1498799,0.0009367493912577629,-0.1498799,-0.0009367493912577629,logit,pad,32,"Mild hyperemesis gravidarum"
+A481,269,110,0.10231836,0.0009301669218323448,-0.10231836,-0.0009301669218323448,logit,pad,32,"Legionnaires' disease"
+A020,14,75,0.06853239,0.0009137652317682902,-0.06853239,-0.0009137652317682902,logit,pad,32,"Salmonella enteritis"
+M264,13837,92,0.082025304,0.0008915793960509093,-0.082025304,-0.0008915793960509093,logit,pad,32,"Malocclusion, unspecified"

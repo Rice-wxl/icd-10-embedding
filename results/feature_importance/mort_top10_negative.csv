@@ -1,0 +1,11 @@
+icd_code,code_id,support_eval,ig_absolute_total,ig_absolute_mean,ig_signed_total,ig_signed_mean,target,baseline,steps,icd_description
+K3580,10405,440,1.9910326,0.004525074091824619,-1.9910326,-0.004525074091824619,logit,pad,32,"Unspecified acute appendicitis"
+J210,9845,274,1.2033303,0.004391716344513162,-1.2033303,-0.004391716344513162,logit,pad,32,"Acute bronchiolitis due to respiratory syncytial virus"
+G454,4898,65,0.28154826,0.004331511717576247,-0.28154826,-0.004331511717576247,logit,pad,32,"Transient global amnesia"
+O1415,18447,406,1.5893381,0.003914625773876171,-1.5893381,-0.003914625773876171,logit,pad,32,"Severe pre-eclampsia, complicating the puerperium"
+J4542,9926,64,0.23545519,0.003678987268358469,-0.23545519,-0.003678987268358469,logit,pad,32,"Moderate persistent asthma with status asthmaticus"
+K3530,10401,61,0.2209405,0.0036219754179970163,-0.2209405,-0.0036219754179970163,logit,pad,32,"Acute appendicitis with localized peritonitis, without perforation or gangrene"
+Z390,53487,65,0.23391767,0.0035987333609507634,-0.23391767,-0.0035987333609507634,logit,pad,32,"Encounter for care and examination of mother immediately after delivery"
+Z2882,53361,770,2.7414398,0.0035603114536830356,-2.7414398,-0.0035603114536830356,logit,pad,32,"Immunization not carried out because of caregiver refusal"
+O1495,18457,157,0.54092187,0.003445362209514448,-0.54092187,-0.003445362209514448,logit,pad,32,"Unspecified pre-eclampsia, complicating the puerperium"
+W540XXA,51645,192,0.6613718,0.0034446449329455695,-0.6613718,-0.0034446449329455695,logit,pad,32,"Bitten by dog, initial encounter"

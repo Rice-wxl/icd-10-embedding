@@ -1,0 +1,11 @@
+icd_code,code_id,support_eval,ig_absolute_total,ig_absolute_mean,ig_signed_total,ig_signed_mean,target,baseline,steps,icd_description
+I469,8592,2237,6.621743,0.0029600997774740603,6.621743,0.0029600997774740603,logit,pad,32,"Cardiac arrest, cause unspecified"
+G9382,5224,194,0.52201957,0.0026908225005434962,0.52201957,0.0026908225005434962,logit,pad,32,"Brain death"
+I468,8591,495,1.2693852,0.0025644145830713136,1.2693852,0.0025644145830713136,logit,pad,32,"Cardiac arrest due to other underlying condition"
+I462,8590,627,1.2984638,0.002070915185663689,1.2984638,0.002070915185663689,logit,pad,32,"Cardiac arrest due to underlying cardiac condition"
+P285,20280,98,0.1813705,0.001850719354590591,0.1813705,0.001850719354590591,logit,pad,32,"Respiratory failure of newborn"
+I713,9322,52,0.08898908,0.001711328442280109,0.08898908,0.001711328442280109,logit,pad,32,"Abdominal aortic aneurysm, ruptured"
+J9690,10080,560,0.8665289,0.0015473730862140655,0.8665289,0.0015473730862140655,logit,pad,32,"Respiratory failure, unspecified, unspecified whether with hypoxia or hypercapnia"
+I97711,9736,60,0.090789855,0.001513164242108663,0.090789855,0.001513164242108663,logit,pad,32,"Intraoperative cardiac arrest during other surgery"
+T17918A,42691,67,0.09923121,0.0014810628855406347,0.09923121,0.0014810628855406347,logit,pad,32,"Gastric contents in respiratory tract, part unspecified causing other injury, initial encounter"
+C9202,2109,174,0.25733417,0.001478932027159066,0.25733417,0.001478932027159066,logit,pad,32,"Acute myeloblastic leukemia, in relapse"
