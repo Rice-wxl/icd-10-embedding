@@ -53,5 +53,6 @@ Thumbs.db
 *.swo
 *~
 
-# Claude Code session state
+# Claude Code session state + project instructions
 .claude/
+CLAUDE.md
