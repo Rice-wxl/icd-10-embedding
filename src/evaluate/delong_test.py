@@ -17,23 +17,23 @@ from sklearn.metrics import roc_auc_score
 import pickle
 from rocauc_comparison import delong_roc_test
 
-from config import MODEL_DIR, NRD_2021_TEST, NRD_2022_TEST, SMALL_DATASET_DIR, DELONG_RESULTS_DIR
+from config import (
+    OUTCOME, OUTCOME_LOWER, MODEL_PATH,
+    LABEL_ENCODER_PATH, AGE_SCALER_PATH,
+    NRD_2021_TEST, NRD_2022_TEST, SMALL_DATASET_DIR, DELONG_RESULTS_DIR,
+)
 
 # ============================================
 # CONFIGURATION
 # ============================================
 
-# Model to evaluate
-MODEL_PATH = MODEL_DIR / 'mort_nodie_hypertrial_auc.keras'
-
-# Outcome variable (must match what model was trained on)
-# Options: 'DIED', 'MOR30', 'REA30'
-OUTCOME_VAR = 'MOR30'
+# Outcome + model paths come from config.py — change OUTCOME there.
+OUTCOME_VAR = OUTCOME
 
 # Test data paths (2021-2022 actual test data)
 TEST_2021_PATH = NRD_2021_TEST
 TEST_2022_PATH = NRD_2022_TEST
-TEST_DATA_PATH = SMALL_DATASET_DIR / f'small_test_dataset_{OUTCOME_VAR.lower()}.csv'
+TEST_DATA_PATH = SMALL_DATASET_DIR / f'small_test_dataset_{OUTCOME_LOWER}.csv'
 
 # Test data sampling (to reduce computational cost)
 TEST_SAMPLE_FRACTION = 0.10  # Use 10% of test data (stratified)
@@ -300,9 +300,9 @@ def main():
     model = load_model(MODEL_PATH)
     print(f"  Model loaded: {model.name}")
 
-    with open('Model/full_label_encoder.pkl', 'rb') as f:
+    with open(LABEL_ENCODER_PATH, 'rb') as f:
         encoder = pickle.load(f)
-    with open('Model/full_age_scaler.pkl', 'rb') as f:
+    with open(AGE_SCALER_PATH, 'rb') as f:
         age_scaler = pickle.load(f)
     print(f"  ICD encoder: {len(encoder.classes_)} unique codes")
 

@@ -1,6 +1,6 @@
 # ICD-10 Outcome Prediction
 
-Deep learning models for predicting in-hospital mortality (`DIED`, `MOR30`)
+Deep learning models for predicting 30-day postdischarge mortality (`MOR30`)
 and 30-day readmission (`REA30`) from ICD-10 diagnosis codes in the
 HCUP National Readmission Database (NRD), 2016–2022.
 
@@ -55,18 +55,6 @@ icd/
     └── small_dataset/              tiny stratified test samples
 ```
 
-The following directories are referenced by the scripts but **not**
-checked into git (listed in `.gitignore`):
-
-| Path               | Contents                                          |
-|--------------------|---------------------------------------------------|
-| `data/`            | Raw + preprocessed NRD CSVs (~20 GB)              |
-| `Model/`           | Trained `.keras` models, label encoder, scaler    |
-| `Baselines/`       | Logistic-regression baselines for comorbidity indices |
-| `embeddings/`      | Pretrained ICD-10 embedding tables                |
-| `predictions.csv`  | Generated patient-level predictions               |
-| `logs/`            | SLURM `.out` job logs                             |
-
 ## Data access
 
 This project uses the HCUP National Readmission Database (NRD). The data
@@ -78,8 +66,6 @@ Once obtained, place the pooled CSV at the path you set in
 `src/config.py` (default: the value of `NRD_RAW_CSV`).
 
 ## Environment setup
-
-Developed on Brown University's Oscar HPC cluster.
 
 ```bash
 conda env create -f environment.yml
@@ -165,13 +151,14 @@ a trained model. See **TODO** below.
 
 | Outcome    | Definition                                              |
 |------------|---------------------------------------------------------|
-| `DIED`     | In-hospital mortality                                   |
-| `MOR30`    | 30-day mortality (in or out of hospital)                |
-| `REA30`    | 30-day readmission (excludes patients who died)         |
+| `MOR30`    | 30-day post-discharge mortality                         |
+| `REA30`    | 30-day readmission                                      |
 
-To switch outcome, edit `OUTCOME` in `src/config.py` (used by
-`preprocessing.py`) and the `OUTCOME_VAR` constant inside the relevant
-training/evaluation script.
+To switch outcome, edit a single line — `OUTCOME` in `src/config.py`.
+Every script (training, evaluation, calibration, DeLong, IG,
+visualization, inference) reads from this constant and the derived
+`OUTCOME_SUBDIR`, `OUTCOME_DATA_DIR`, and `MODEL_PATH` paths, so no other
+files need to be touched.
 
 ## Results
 

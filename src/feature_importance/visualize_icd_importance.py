@@ -3,13 +3,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import textwrap
 
-from config import FEATURE_IMPORTANCE_DIR, FEATURE_IMPORTANCE_FIG_DIR
+from config import OUTCOME_LOWER, OUTCOME_SUBDIR, FEATURE_IMPORTANCE_DIR, FEATURE_IMPORTANCE_FIG_DIR
 
-output_var = "mor30"
-
-# Read the CSV files
-positive_df = pd.read_csv(FEATURE_IMPORTANCE_DIR / 'mort_top10_positive.csv')
-negative_df = pd.read_csv(FEATURE_IMPORTANCE_DIR / 'mort_top10_negative.csv')
+# Read the top10 CSVs produced by IG.py for the current OUTCOME
+positive_df = pd.read_csv(FEATURE_IMPORTANCE_DIR / f'{OUTCOME_SUBDIR}_top10_positive.csv')
+negative_df = pd.read_csv(FEATURE_IMPORTANCE_DIR / f'{OUTCOME_SUBDIR}_top10_negative.csv')
 
 # Select relevant columns and combine
 positive_data = positive_df[['icd_code', 'ig_signed_mean', 'icd_description']].copy()
@@ -77,7 +75,7 @@ ax.grid(axis='x', alpha=0.3, linestyle='--')
 plt.tight_layout()
 
 # Save the figure
-output_path = FEATURE_IMPORTANCE_FIG_DIR / f'icd_importance_{output_var}.png'
+output_path = FEATURE_IMPORTANCE_FIG_DIR / f'icd_importance_{OUTCOME_LOWER}.png'
 plt.savefig(output_path, dpi=300, bbox_inches='tight')
 print(f"Lollipop chart saved to: {output_path}")
 

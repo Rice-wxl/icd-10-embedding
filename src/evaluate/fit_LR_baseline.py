@@ -18,24 +18,20 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 import pickle
 
-from config import DATA_DIR
+from config import OUTCOME, OUTCOME_LOWER, OUTCOME_DATA_DIR, BASELINES_DIR
 
 # ============================================
 # CONFIGURATION
 # ============================================
 
-# Outcome variable: 'MOR30' or 'REA30'
-OUTCOME_VAR = 'REA30'
+# Outcome + data paths come from config.py — change OUTCOME there.
+OUTCOME_VAR = OUTCOME
 
 # Paths to training data (downsampled) — same as hyper_tune.py / transformer.py
-if OUTCOME_VAR == 'MOR30':
-    OUTCOME_DIR = DATA_DIR / 'mort_nodie'
-elif OUTCOME_VAR == 'REA30':
-    OUTCOME_DIR = DATA_DIR / 'readmit'
-TRAIN_X_PATH = OUTCOME_DIR / 'X_train_downsampled.csv'
-TRAIN_Y_PATH = OUTCOME_DIR / 'y_train_downsampled.csv'
-VAL_X_PATH = OUTCOME_DIR / 'X_test.csv'
-VAL_Y_PATH = OUTCOME_DIR / 'y_test.csv'
+TRAIN_X_PATH = OUTCOME_DATA_DIR / 'X_train_downsampled.csv'
+TRAIN_Y_PATH = OUTCOME_DATA_DIR / 'y_train_downsampled.csv'
+VAL_X_PATH = OUTCOME_DATA_DIR / 'X_test.csv'
+VAL_Y_PATH = OUTCOME_DATA_DIR / 'y_test.csv'
 
 # Baseline indices to fit
 BASELINE_INDICES = ['INDEX_MORTALITY', 'INDEX_READMISSION',
@@ -109,9 +105,8 @@ def main():
             print(f"  Validation prob range: [{val_probs.min():.6f}, {val_probs.max():.6f}]")
 
         # Save the fitted LR model
-        out_dir = 'Baselines'
-        os.makedirs(out_dir, exist_ok=True)
-        out_path = f'{out_dir}/lr_{index_name.lower()}_{OUTCOME_VAR.lower()}.pkl'
+        BASELINES_DIR.mkdir(parents=True, exist_ok=True)
+        out_path = BASELINES_DIR / f'lr_{index_name.lower()}_{OUTCOME_LOWER}.pkl'
         with open(out_path, 'wb') as f:
             pickle.dump(lr, f)
         print(f"  Saved to: {out_path}")

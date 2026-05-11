@@ -21,30 +21,25 @@ from keras.layers import Dense, Dropout, LayerNormalization, MultiHeadAttention
 from keras.models import Model
 import pickle
 
+from config import (
+    OUTCOME, OUTCOME_LOWER, MODEL_PATH,
+    LABEL_ENCODER_PATH, AGE_SCALER_PATH, SMALL_DATASET_DIR,
+)
+
 # ============================================
 # CONFIGURATION - MODIFY THESE AS NEEDED
 # ============================================
 
-# Path to trained model
-MODEL_PATH = 'Model/readmit_hypertrial_auc.keras'
+# Model + outcome come from config.py — change OUTCOME there.
+OUTCOME_VAR = OUTCOME
 
 # Youden threshold (obtained from validation set)
 YOUDEN_THRESHOLD = 0.5022004246711731  # Replace with actual threshold from evaluate.py
 
-# Outcome variable (should match what the model was trained on)
-# Options: 'DIED', 'MOR30', 'REA30'
-OUTCOME_VAR = 'rea30'
-
-
 # Path to test dataset
-# TEST_DATA_PATH = f'small_test_dataset_{OUTCOME_VAR}.csv'
-TEST_DATA_PATH = f'small_dataset_{OUTCOME_VAR}_custom.csv'
+TEST_DATA_PATH = SMALL_DATASET_DIR / f'small_dataset_{OUTCOME_LOWER}_custom.csv'
 # Output file for predictions
-# OUTPUT_FILE = f'small_dataset_predictions_{OUTCOME_VAR}.csv'
-OUTPUT_FILE = f'small_dataset_custom_preds_{OUTCOME_VAR}.csv'
-
-
-OUTCOME_VAR = OUTCOME_VAR.upper()
+OUTPUT_FILE = SMALL_DATASET_DIR / f'small_dataset_custom_preds_{OUTCOME_LOWER}.csv'
 
 # ============================================
 # CUSTOM KERAS COMPONENTS
@@ -207,9 +202,9 @@ def main():
 
     # Load encoders
     print("\nLoading encoders...")
-    with open('Model/full_label_encoder.pkl', 'rb') as file:
+    with open(LABEL_ENCODER_PATH, 'rb') as file:
         encoder = pickle.load(file)
-    with open('Model/full_age_scaler.pkl', 'rb') as file:
+    with open(AGE_SCALER_PATH, 'rb') as file:
         age_scaler = pickle.load(file)
     print(f"  ICD encoder: {len(encoder.classes_)} unique codes")
     print(f"  Age scaler: loaded")

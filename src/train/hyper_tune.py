@@ -16,14 +16,13 @@ from keras.saving import register_keras_serializable
 import keras.backend as K
 import keras_tuner as kt
 
-from config import DATA_DIR, LABEL_ENCODER_PATH
+from config import OUTCOME_DATA_DIR, OUTCOME_SUBDIR, MODEL_DIR, LABEL_ENCODER_PATH
 
-# Load train and test datasets — change "readmit" to "mort" or "mort_nodie" to tune for a different outcome
-OUTCOME_DIR = DATA_DIR / 'readmit'
-X_train_downsampled = pd.read_csv(OUTCOME_DIR / 'X_train_downsampled.csv')
-y_train_downsampled = pd.read_csv(OUTCOME_DIR / 'y_train_downsampled.csv')
-X_test = pd.read_csv(OUTCOME_DIR / 'X_test.csv')
-y_test = pd.read_csv(OUTCOME_DIR / 'y_test.csv')
+# Load train and test datasets — outcome is set in config.py (OUTCOME)
+X_train_downsampled = pd.read_csv(OUTCOME_DATA_DIR / 'X_train_downsampled.csv')
+y_train_downsampled = pd.read_csv(OUTCOME_DATA_DIR / 'y_train_downsampled.csv')
+X_test = pd.read_csv(OUTCOME_DATA_DIR / 'X_test.csv')
+y_test = pd.read_csv(OUTCOME_DATA_DIR / 'y_test.csv')
 
 # Load the LabelEncoder for ICD codes
 with open(LABEL_ENCODER_PATH, 'rb') as file:
@@ -309,7 +308,7 @@ tuner = kt.RandomSearch(
     max_trials=32,
     executions_per_trial=1,
     directory="logs",
-    project_name="ICD_hyperparameter_tuning_readmit_auc"
+    project_name=f"ICD_hyperparameter_tuning_{OUTCOME_SUBDIR}_auc"
 )
 
 icd_columns = [f'I10_DX{i}' for i in range(1, 41)]
@@ -361,4 +360,4 @@ print(f'Test Recall: {test_recall:.4f}')
 print(f'Test F2 Score: {test_f2:.4f}')
 
 # Save the trained model
-best_model.save('Model/readmit_hypertrial_auc.keras')
+best_model.save(MODEL_DIR / f'{OUTCOME_SUBDIR}_hypertrial_auc.keras')

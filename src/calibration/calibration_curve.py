@@ -13,22 +13,22 @@ from keras.layers import Dense, Dropout, LayerNormalization, MultiHeadAttention
 import pickle
 import matplotlib.pyplot as plt
 
-from config import DATA_DIR, MODEL_DIR, NRD_2021_TEST, NRD_2022_TEST, BASELINES_DIR, FIGURES_DIR
+from config import (
+    OUTCOME, OUTCOME_LOWER, OUTCOME_DATA_DIR, MODEL_PATH,
+    LABEL_ENCODER_PATH, AGE_SCALER_PATH,
+    NRD_2021_TEST, NRD_2022_TEST, BASELINES_DIR, FIGURES_DIR,
+)
 
 # ============================================
 # CONFIGURATION - MODIFY THESE AS NEEDED
 # ============================================
 
-# Path to trained model
-MODEL_PATH = MODEL_DIR / 'mort_nodie_hypertrial_auc.keras'
-
-# Outcome variable (should match what the model was trained on)
-# Options: 'DIED', 'MOR30', 'REA30'
-OUTCOME_VAR = 'MOR30'
+# Outcome + model + data paths come from config.py — change OUTCOME there.
+OUTCOME_VAR = OUTCOME
 
 # Paths to training data (downsampled)
-TRAIN_X_PATH = DATA_DIR / 'mort_nodie' / 'X_train_downsampled.csv'
-TRAIN_Y_PATH = DATA_DIR / 'mort_nodie' / 'y_train_downsampled.csv'
+TRAIN_X_PATH = OUTCOME_DATA_DIR / 'X_train_downsampled.csv'
+TRAIN_Y_PATH = OUTCOME_DATA_DIR / 'y_train_downsampled.csv'
 
 # Paths to 2021-2022 test data (actual test set)
 TEST_2021_PATH = NRD_2021_TEST
@@ -519,9 +519,9 @@ def main():
 
     # Load encoders (needed for both modes to preprocess test data)
     print("\nLoading encoders...")
-    with open('Model/full_label_encoder.pkl', 'rb') as file:
+    with open(LABEL_ENCODER_PATH, 'rb') as file:
         encoder = pickle.load(file)
-    with open('Model/full_age_scaler.pkl', 'rb') as file:
+    with open(AGE_SCALER_PATH, 'rb') as file:
         age_scaler = pickle.load(file)
     print(f"  ICD encoder: {len(encoder.classes_)} unique codes")
 

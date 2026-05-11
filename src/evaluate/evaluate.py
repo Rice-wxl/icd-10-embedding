@@ -19,7 +19,11 @@ import matplotlib.pyplot as plt
 import pickle
 from scipy import stats
 
-from config import DATA_DIR, MODEL_DIR, NRD_2021_TEST, NRD_2022_TEST, FIGURES_DIR
+from config import (
+    OUTCOME, OUTCOME_LOWER, OUTCOME_DATA_DIR, MODEL_PATH,
+    LABEL_ENCODER_PATH, AGE_SCALER_PATH,
+    NRD_2021_TEST, NRD_2022_TEST, FIGURES_DIR,
+)
 
 # ============================================
 # CONFIGURATION
@@ -30,16 +34,12 @@ from config import DATA_DIR, MODEL_DIR, NRD_2021_TEST, NRD_2022_TEST, FIGURES_DI
 # Set to False to use all inputs (ICD codes + AGE + FEMALE + PAY1 + ZIPINC_QRTL)
 USE_ICD_ONLY = False
 
-# Model to evaluate
-MODEL_PATH = MODEL_DIR / 'readmit_auc_with_transformers.keras'
-
-# Outcome variable (must match what model was trained on)
-# Options: 'DIED', 'MOR30', 'REA30'
-OUTCOME_VAR = 'REA30'
+# Outcome + model + data paths come from config.py — change OUTCOME there.
+OUTCOME_VAR = OUTCOME
 
 # Validation data paths (for finding Youden threshold)
-VALIDATION_X_PATH = DATA_DIR / 'readmit' / 'X_test.csv'
-VALIDATION_Y_PATH = DATA_DIR / 'readmit' / 'y_test.csv'
+VALIDATION_X_PATH = OUTCOME_DATA_DIR / 'X_test.csv'
+VALIDATION_Y_PATH = OUTCOME_DATA_DIR / 'y_test.csv'
 
 # Test data paths (2021-2022 actual test data)
 TEST_2021_PATH = NRD_2021_TEST
@@ -49,7 +49,7 @@ TEST_2022_PATH = NRD_2022_TEST
 TEST_SAMPLE_FRACTION = 0.10  # Use 10% of test data (stratified)
 
 # Output file for ROC curve
-OUTPUT_PLOT = FIGURES_DIR / 'roc' / f'graph_newci_{OUTCOME_VAR.lower()}.png'
+OUTPUT_PLOT = FIGURES_DIR / 'roc' / f'graph_newci_{OUTCOME_LOWER}.png'
 
 # ============================================
 # CUSTOM KERAS COMPONENTS
@@ -719,9 +719,9 @@ def main():
     model = load_model(MODEL_PATH)
     print(f"  Model loaded: {model.name}")
 
-    with open('Model/full_label_encoder.pkl', 'rb') as f:
+    with open(LABEL_ENCODER_PATH, 'rb') as f:
         encoder = pickle.load(f)
-    with open('Model/full_age_scaler.pkl', 'rb') as f:
+    with open(AGE_SCALER_PATH, 'rb') as f:
         age_scaler = pickle.load(f)
     print(f"  ICD encoder: {len(encoder.classes_)} unique codes")
 

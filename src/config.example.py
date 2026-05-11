@@ -61,6 +61,29 @@ SMALL_DATASET_DIR = RESULTS_DIR / "small_dataset"
 PREDICTIONS_CSV = REPO_ROOT / "predictions.csv"
 
 # ---------------------------------------------------------------------------
-# Default outcome variable: 'DIED', 'MOR30', or 'REA30'
+# OUTCOME — single source of truth for the entire pipeline.
+# Change this one line to switch which outcome you train/evaluate on.
+# Supported: 'MOR30' (30-day post-discharge mortality)
+#            'REA30' (30-day readmission)
 # ---------------------------------------------------------------------------
 OUTCOME = "MOR30"
+
+# Derived — keep in sync with OUTCOME automatically. Don't edit.
+OUTCOME_LOWER = OUTCOME.lower()                 # 'mor30' / 'rea30' — for output filenames
+
+# Maps OUTCOME → preprocessed-data subdirectory name (also used as prefix
+# for trained-model and feature-importance filenames).
+_OUTCOME_TO_SUBDIR = {
+    "MOR30": "mort_nodie",
+    "REA30": "readmit",
+}
+OUTCOME_SUBDIR = _OUTCOME_TO_SUBDIR[OUTCOME]    # 'mort_nodie' / 'readmit'
+OUTCOME_DATA_DIR = DATA_DIR / OUTCOME_SUBDIR    # holds X_train_downsampled.csv etc.
+
+# Trained model selected for evaluation / calibration / interpretation.
+# Edit the suffix here to switch between variants:
+#   _hypertrial_auc          (default — best from hyperparameter search)
+#   _icd_only                (no demographic features)
+#   _no_deepset              (ablation)
+#   _auc_with_transformers   (with TransformerBlock)
+MODEL_PATH = MODEL_DIR / f"{OUTCOME_SUBDIR}_hypertrial_auc.keras"

@@ -15,15 +15,14 @@ from keras.saving import register_keras_serializable
 import keras
 import numpy as np
 
-from config import DATA_DIR, LABEL_ENCODER_PATH
+from config import OUTCOME_DATA_DIR, OUTCOME_SUBDIR, MODEL_DIR, LABEL_ENCODER_PATH
 
 
-# Load train and test datasets — change "readmit" to "mort" or "mort_nodie" for a different outcome
-OUTCOME_DIR = DATA_DIR / 'readmit'
-X_train_downsampled = pd.read_csv(OUTCOME_DIR / 'X_train_downsampled.csv')
-y_train_downsampled = pd.read_csv(OUTCOME_DIR / 'y_train_downsampled.csv')
-X_test = pd.read_csv(OUTCOME_DIR / 'X_test.csv')
-y_test = pd.read_csv(OUTCOME_DIR / 'y_test.csv')
+# Load train and test datasets — outcome is set in config.py (OUTCOME)
+X_train_downsampled = pd.read_csv(OUTCOME_DATA_DIR / 'X_train_downsampled.csv')
+y_train_downsampled = pd.read_csv(OUTCOME_DATA_DIR / 'y_train_downsampled.csv')
+X_test = pd.read_csv(OUTCOME_DATA_DIR / 'X_test.csv')
+y_test = pd.read_csv(OUTCOME_DATA_DIR / 'y_test.csv')
 
 
 # Load the LabelEncoder for ICD codes
@@ -392,4 +391,4 @@ print(f'Test Recall: {test_recall:.4f}')
 print(f'Test F2 Score: {test_f2:.4f}')
 
 # # Save the trained model
-model.save('Model/readmit_pretrained_50.keras')
+model.save(MODEL_DIR / f'{OUTCOME_SUBDIR}_pretrained_50.keras')

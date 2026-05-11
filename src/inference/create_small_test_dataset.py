@@ -7,15 +7,14 @@ both positive and negative cases are included.
 import pandas as pd
 import numpy as np
 
-from config import NRD_2021_TEST, NRD_2022_TEST, SMALL_DATASET_DIR
+from config import OUTCOME_LOWER, NRD_2021_TEST, NRD_2022_TEST, SMALL_DATASET_DIR
 
 # Configuration
 SAMPLE_SIZE = 20
 RANDOM_SEED = 42
 
-# Define the outcome variable you want to test
-# Options: 'died', 'mor30', 'rea30'
-OUTCOME_VAR = 'rea30'  # Change this as needed
+# Outcome comes from config.py (OUTCOME)
+OUTCOME_VAR = OUTCOME_LOWER
 OUTPUT_FILE = SMALL_DATASET_DIR / f"small_test_dataset_{OUTCOME_VAR}.csv"
 
 print(f"Creating small test dataset for outcome: {OUTCOME_VAR}")

@@ -4,7 +4,7 @@ from tqdm import tqdm
 import pandas as pd
 import pickle
 
-from config import NRD_RAW_CSV, OUTCOME
+from config import NRD_RAW_CSV, OUTCOME, LABEL_ENCODER_PATH, AGE_SCALER_PATH
 
 output_csv = str(NRD_RAW_CSV)
 outcome_var = OUTCOME  # Define the outcome variable here, e.g., 'DIED', 'MOR30', 'REA30'
@@ -75,11 +75,11 @@ outcome_var = OUTCOME  # Define the outcome variable here, e.g., 'DIED', 'MOR30'
 ## Second pass
 
 # Load the LabelEncoder for ICD codes
-with open('Model/full_label_encoder.pkl', 'rb') as file:
+with open(LABEL_ENCODER_PATH, 'rb') as file:
     encoder = pickle.load(file)
 
 # Load the MinMaxScaler for 'AGE'
-with open('Model/full_age_scaler.pkl', 'rb') as file:
+with open(AGE_SCALER_PATH, 'rb') as file:
     age_scaler = pickle.load(file)
 
 # Columns we’ll process

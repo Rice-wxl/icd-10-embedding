@@ -33,6 +33,8 @@ from keras.models import Model
 import pickle
 import sys
 
+from config import LABEL_ENCODER_PATH, AGE_SCALER_PATH
+
 # ============================================
 # CUSTOM KERAS COMPONENTS
 # ============================================
@@ -350,9 +352,9 @@ Examples:
     # Model configuration
     parser.add_argument('--threshold', type=float, default=0.5,
                         help='Classification threshold (default: 0.5)')
-    parser.add_argument('--encoder-path', type=str, default='Model/full_label_encoder.pkl',
+    parser.add_argument('--encoder-path', type=str, default=str(LABEL_ENCODER_PATH),
                         help='Path to ICD label encoder pickle file')
-    parser.add_argument('--scaler-path', type=str, default='Model/full_age_scaler.pkl',
+    parser.add_argument('--scaler-path', type=str, default=str(AGE_SCALER_PATH),
                         help='Path to age scaler pickle file')
 
     # Output options

@@ -20,7 +20,11 @@ from keras.models import Model
 from sklearn.utils import shuffle
 from tqdm import tqdm
 
-from config import NRD_2021_TEST, NRD_2022_TEST, FEATURE_IMPORTANCE_DIR
+from config import (
+    OUTCOME_SUBDIR, MODEL_PATH,
+    LABEL_ENCODER_PATH, AGE_SCALER_PATH,
+    NRD_2021_TEST, NRD_2022_TEST, FEATURE_IMPORTANCE_DIR,
+)
 
 @tf.keras.utils.register_keras_serializable(package="Custom")
 def f2_score(y_true, y_pred):
@@ -180,14 +184,14 @@ class F2Score(tf.keras.metrics.Metric):
 
 
 # Load the trained model
-model = load_model('Model/readmit_hypertrial_auc.keras')
+model = load_model(MODEL_PATH)
 
 # Load the LabelEncoder for ICD codes
-with open('Model/full_label_encoder.pkl', 'rb') as file:
+with open(LABEL_ENCODER_PATH, 'rb') as file:
     encoder = pickle.load(file)
 
 # Load the MinMaxScaler for 'AGE'
-with open('Model/full_age_scaler.pkl', 'rb') as file:
+with open(AGE_SCALER_PATH, 'rb') as file:
     age_scaler = pickle.load(file)
 
 # new_data_file_path = '/users/xwang259/icd/data/NRD_2019_Small.dta'
@@ -475,8 +479,8 @@ print(top20_global[["icd_code","support_eval","ig_absolute_total","ig_absolute_m
 print(f"\nTop {top_num} ICDs by PER-OCCURRENCE effect (absolute value, min support={min_support}):")
 print(top20_per_occ[["icd_code","support_eval","ig_absolute_mean","ig_absolute_total"]].to_string(index=False))
 
-top20_global.to_csv(FEATURE_IMPORTANCE_DIR / "readmit_top20_global.csv", index=False)
-top20_per_occ.to_csv(FEATURE_IMPORTANCE_DIR / "readmit_top20_per_occurrence.csv", index=False)
+top20_global.to_csv(FEATURE_IMPORTANCE_DIR / f"{OUTCOME_SUBDIR}_top20_global.csv", index=False)
+top20_per_occ.to_csv(FEATURE_IMPORTANCE_DIR / f"{OUTCOME_SUBDIR}_top20_per_occurrence.csv", index=False)
 
 
 
@@ -490,5 +494,5 @@ print(top10_positive[["icd_code","support_eval","ig_signed_total","ig_signed_mea
 print(f"\nTop 10 ICDs by PER-OCCURRENCE with the most negative effect:")
 print(top10_negative[["icd_code","support_eval","ig_signed_total","ig_signed_mean"]].to_string(index=False))
 
-top10_positive.to_csv(FEATURE_IMPORTANCE_DIR / "readmit_top10_positive.csv", index=False)
-top10_negative.to_csv(FEATURE_IMPORTANCE_DIR / "readmit_top10_negative.csv", index=False)
+top10_positive.to_csv(FEATURE_IMPORTANCE_DIR / f"{OUTCOME_SUBDIR}_top10_positive.csv", index=False)
+top10_negative.to_csv(FEATURE_IMPORTANCE_DIR / f"{OUTCOME_SUBDIR}_top10_negative.csv", index=False)
