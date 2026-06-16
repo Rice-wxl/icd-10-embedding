@@ -88,6 +88,26 @@ Every Python script does `from config import ...`, so changing a path
 once in `src/config.py` is enough. `src/config.py` is gitignored so
 personal paths never enter version control.
 
+## Pretrained models (Hugging Face Hub)
+
+Trained `.keras` weights and the fitted `LabelEncoder` / `MinMaxScaler`
+are published to a single Hugging Face repo. Downloading them populates
+`Model/` with the same filenames `src/config.py` already resolves, so the
+evaluation, calibration, DeLong, IG, and inference scripts run unchanged
+without first running training.
+
+```bash
+# Only needed for a private repo:
+# export HF_TOKEN=hf_xxx
+
+python scripts/download_from_hf.py --repo-id <user-or-org>/<repo-name>
+```
+
+Custom Keras classes (`DeepSet`, `TransformerBlock`, `F2Score`) are **not**
+shipped via the HF repo — they are defined inline at the top of every
+script that calls `load_model`, which registers them in the Keras
+serializable registry before deserialization runs.
+
 ## Pipeline
 
 All long-running jobs are launched via SLURM batch scripts in `scripts/`.

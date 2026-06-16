@@ -23,6 +23,7 @@ from config import (
     OUTCOME, OUTCOME_LOWER, OUTCOME_DATA_DIR, MODEL_PATH,
     LABEL_ENCODER_PATH, AGE_SCALER_PATH,
     NRD_2021_TEST, NRD_2022_TEST, FIGURES_DIR,
+    EVALUATION_RESULTS_DIR,
 )
 
 # ============================================
@@ -584,6 +585,7 @@ def compute_metrics_from_predictions(y_true, y_pred_binary):
     accuracy = accuracy_score(y_true, y_pred_binary)
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+    specificity = tn / (tn + fp) if (tn + fp) > 0 else 0.0
     f1 = f1_score(y_true, y_pred_binary, zero_division=0)
 
     # F2 score (weights recall 2x more than precision)
@@ -594,6 +596,7 @@ def compute_metrics_from_predictions(y_true, y_pred_binary):
         'accuracy': accuracy,
         'precision': precision,
         'recall': recall,
+        'specificity': specificity,
         'f1': f1,
         'f2': f2,
         'tp': tp,
@@ -743,7 +746,9 @@ def main():
         OUTCOME_VAR, sample_fraction=TEST_SAMPLE_FRACTION
     )
     print(f"  Test set: {X_test.shape[0]:,} samples")
-    print(f"  Positive rate: {np.mean(y_test):.4f}")
+    n_pos_test = int(np.sum(y_test))
+    print(f"  Positive samples: {n_pos_test:,}")
+    print(f"  Positive rate: {n_pos_test / len(y_test):.4f}")
 
     # ========================================
     # Step 4: Prepare model inputs
@@ -791,11 +796,15 @@ def main():
         print(f"    Accuracy: {val_metrics['accuracy']:.4f}")
         print(f"    Precision: {val_metrics['precision']:.4f}")
         print(f"    Recall: {val_metrics['recall']:.4f}")
+        print(f"    Specificity: {val_metrics['specificity']:.4f}")
         print(f"    F1 Score: {val_metrics['f1']:.4f}")
         print(f"    F2 Score: {val_metrics['f2']:.4f}")
     else:
         print("  Warning: Only one class in validation set, cannot find threshold")
         best_threshold = 0.5
+        val_metrics = None
+        val_auc = None
+        val_auc_ci = (None, None)
 
     # ========================================
     # Step 7: Evaluate on test set
@@ -813,6 +822,7 @@ def main():
         print(f"    Accuracy: {test_metrics['accuracy']:.4f}")
         print(f"    Precision: {test_metrics['precision']:.4f}")
         print(f"    Recall: {test_metrics['recall']:.4f}")
+        print(f"    Specificity: {test_metrics['specificity']:.4f}")
         print(f"    F1 Score: {test_metrics['f1']:.4f}")
         print(f"    F2 Score: {test_metrics['f2']:.4f}")
         print(f"\n  Confusion matrix:")
@@ -820,6 +830,9 @@ def main():
         print(f"    FN: {test_metrics['fn']}, TP: {test_metrics['tp']}")
     else:
         print("  Warning: Only one class in test set, cannot compute metrics")
+        test_metrics = None
+        test_auc = None
+        test_auc_ci = (None, None)
 
     # ========================================
     # Step 8: Compare against traditional scores
@@ -859,14 +872,20 @@ def main():
 
         results.append({
             'Index': index,
+            'Threshold': index_threshold,
             'AUC': auc,
             'AUC Lower CI': auc_ci[0],
             'AUC Upper CI': auc_ci[1],
             'Accuracy': metrics['accuracy'],
             'Precision': metrics['precision'],
             'Recall': metrics['recall'],
+            'Specificity': metrics['specificity'],
             'F1 Score': metrics['f1'],
-            'F2 Score': metrics['f2']
+            'F2 Score': metrics['f2'],
+            'TN': metrics['tn'],
+            'FP': metrics['fp'],
+            'FN': metrics['fn'],
+            'TP': metrics['tp'],
         })
 
         # Add to baseline curves for plotting
@@ -910,6 +929,77 @@ def main():
     #     auc_value=test_auc,
     #     auc_ci=test_auc_ci
     # )
+
+    # ========================================
+    # Step 10: Save results to file
+    # ========================================
+    print("\nStep 10: Saving evaluation results...")
+    EVALUATION_RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    model_stem = MODEL_PATH.stem
+
+    rows = []
+    if val_metrics is not None:
+        rows.append({
+            'Model': model_stem,
+            'Split': 'validation',
+            'Threshold': best_threshold,
+            'AUC': val_auc,
+            'AUC Lower CI': val_auc_ci[0],
+            'AUC Upper CI': val_auc_ci[1],
+            'Accuracy': val_metrics['accuracy'],
+            'Precision': val_metrics['precision'],
+            'Recall': val_metrics['recall'],
+            'Specificity': val_metrics['specificity'],
+            'F1 Score': val_metrics['f1'],
+            'F2 Score': val_metrics['f2'],
+            'TN': val_metrics['tn'],
+            'FP': val_metrics['fp'],
+            'FN': val_metrics['fn'],
+            'TP': val_metrics['tp'],
+        })
+    if test_metrics is not None:
+        rows.append({
+            'Model': model_stem,
+            'Split': 'test',
+            'Threshold': best_threshold,
+            'AUC': test_auc,
+            'AUC Lower CI': test_auc_ci[0],
+            'AUC Upper CI': test_auc_ci[1],
+            'Accuracy': test_metrics['accuracy'],
+            'Precision': test_metrics['precision'],
+            'Recall': test_metrics['recall'],
+            'Specificity': test_metrics['specificity'],
+            'F1 Score': test_metrics['f1'],
+            'F2 Score': test_metrics['f2'],
+            'TN': test_metrics['tn'],
+            'FP': test_metrics['fp'],
+            'FN': test_metrics['fn'],
+            'TP': test_metrics['tp'],
+        })
+    for r in results:
+        rows.append({
+            'Model': r['Index'],
+            'Split': 'test',
+            'Threshold': r['Threshold'],
+            'AUC': r['AUC'],
+            'AUC Lower CI': r['AUC Lower CI'],
+            'AUC Upper CI': r['AUC Upper CI'],
+            'Accuracy': r['Accuracy'],
+            'Precision': r['Precision'],
+            'Recall': r['Recall'],
+            'Specificity': r['Specificity'],
+            'F1 Score': r['F1 Score'],
+            'F2 Score': r['F2 Score'],
+            'TN': r['TN'],
+            'FP': r['FP'],
+            'FN': r['FN'],
+            'TP': r['TP'],
+        })
+
+    if rows:
+        results_csv = EVALUATION_RESULTS_DIR / f"{model_stem}_evaluation.csv"
+        pd.DataFrame(rows).to_csv(results_csv, index=False)
+        print(f"  Saved: {results_csv}")
 
     print("\n" + "=" * 70)
     print("EVALUATION COMPLETE!")
